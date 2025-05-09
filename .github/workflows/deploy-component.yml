@@ -76,12 +76,12 @@ jobs:
           working_directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: 📄 Terraform Plan
-        run: terraform plan -input=false -var-file=./variables/${{ env.ENVIRONMENT }}.tfvars
+        run: terraform plan -input=false -var-file=./variables/${{ env.ENVIRONMENT }}.tfvars -out=./tfplan.out
         working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: 🚀 Terraform Apply (only on main)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve -input=false -var-file=./variables/${{ env.ENVIRONMENT }}.tfvars
+        run: terraform apply -input=false "./tfplan.out"
         working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Azure CLI Logout

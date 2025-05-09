@@ -70,7 +70,7 @@ resource "azurerm_role_assignment" "rbac_contributor" {
 }
 
 resource "azurerm_role_assignment" "rbac_blob_data_contributor" {
-  scope                = data.azurerm_subscription.current.id
+  scope                = data.azurerm_subscription.current.id // don't do this
   role_definition_name = "Storage Blob Data Owner"
   principal_id         = azuread_service_principal.service_principal.object_id
 }

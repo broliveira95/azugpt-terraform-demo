@@ -5,7 +5,10 @@ cd iac/rg-azug-demo/
 terraform init -input=false -backend-config=./tf-backend/backend.development.json
 
 ## Plan Terraform
-terraform plan -input=false -var-file=./variables/development.tfvars
+terraform plan -input=false -var-file=./variables/development.tfvars -out=./tfplan.out
 
 ## Plan Terraform
-terraform apply -input=false -var-file=./variables/development.tfvars
+terraform apply "./tfplan.out"
+
+## TF required version
+required_version = ">= 1.3.0"

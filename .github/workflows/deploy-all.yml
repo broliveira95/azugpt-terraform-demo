@@ -14,7 +14,7 @@ jobs:
   development:
     uses: ./.github/workflows/deploy-component.yml
     with:
-      WORKING_DIRECTORY: "./iac/rg-azug-demo"
+      WORKING_DIRECTORY: ./iac/rg-azug-demo
       ENVIRONMENT: development
 
   # production:

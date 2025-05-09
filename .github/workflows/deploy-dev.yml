@@ -10,19 +10,18 @@ permissions:
   id-token: write
   contents: read
 
-env:
-  ARM_USE_OIDC: true
-  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-  WORKING_DIRECTORY: "./iac/rg-azug-demo"
-  ENVIRONMENT: development
-
 jobs:
   terraform:
     name: Terraform Pipeline
     runs-on: ubuntu-latest
-    environment: ${{ env.ENVIRONMENT }}
+    environment: development
+    env:
+      ARM_USE_OIDC: true
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      WORKING_DIRECTORY: "./iac/rg-azug-demo"
+      ENVIRONMENT: development
 
     steps:
       - name: 📥 Checkout code

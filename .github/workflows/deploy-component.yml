@@ -63,7 +63,9 @@ jobs:
 
       - name: 🧹 Terraform Lint (tflint)
         if: ${{ github.event_name == 'pull_request' }}
-        run: tflint --init && tflint
+        run: |
+          tflint --init --config=../.tflint.hcl
+          tflint --config=../.tflint.hcl
         working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: 🔒 Security Scan (tfsec)

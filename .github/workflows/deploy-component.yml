@@ -50,10 +50,12 @@ jobs:
       - name: ✅ Terraform Format Check
         if: ${{ github.event_name == 'pull_request' }}
         run: terraform fmt -check
+        working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: 🧪 Terraform Validate
         if: ${{ github.event_name == 'pull_request' }}
         run: terraform validate
+        working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: ⚙️ Setup Terraform Lint (tflint)
         if: ${{ github.event_name == 'pull_request' }}
@@ -62,17 +64,23 @@ jobs:
       - name: 🧹 Terraform Lint (tflint)
         if: ${{ github.event_name == 'pull_request' }}
         run: tflint --init && tflint
+        working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: 🔒 Security Scan (tfsec)
         if: ${{ github.event_name == 'pull_request' }}
         uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          args: --tfvars-file ./variables/${{ env.ENVIRONMENT }}.tfvars
+          working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: 📄 Terraform Plan
         run: terraform plan -input=false -var-file=./variables/${{ env.ENVIRONMENT }}.tfvars
+        working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: 🚀 Terraform Apply (only on main)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve -input=false -var-file=./variables/${{ env.ENVIRONMENT }}.tfvars
+        working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Azure CLI Logout
         uses: azure/CLI@v2

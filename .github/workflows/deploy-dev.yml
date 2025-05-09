@@ -1,0 +1,82 @@
+name: Terraform Azure CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  ARM_USE_OIDC: true
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  WORKING_DIRECTORY: "./iac/rg-azug-demo"
+  ENVIRONMENT: development
+
+jobs:
+  terraform:
+    name: Terraform Pipeline
+    runs-on: ubuntu-latest
+    environment: ${{ env.ENVIRONMENT }}
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🔐 Login to Azure using OIDC
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: ⚙️ Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: 📦 Terraform Init
+        run: terraform init -input=false -backend-config="./tf-backend/backend.${{ env.ENVIRONMENT }}.json
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+      - name: ✅ Terraform Format Check
+        if: ${{ github.event_name == 'pull_request' }}
+        run: terraform fmt -check
+
+      - name: 🧪 Terraform Validate
+        if: ${{ github.event_name == 'pull_request' }}
+        run: terraform validate
+
+      - name: 🧹 Terraform Lint (tflint)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: terraform-linters/setup-tflint@v4
+      - run: tflint --init && tflint
+
+      - name: 🧹 Terraform Lint (tflint)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: terraform-linters/setup-tflint@v4
+      - run: tflint --init && tflint
+
+      - name: 🔒 Security Scan (tfsec)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: aquasecurity/tfsec-action@v1.0.0
+
+      - name: 📄 Terraform Plan
+        run: terraform plan -input=false -var-file="./variables/${{ env.ENVIRONMENT }}.tfvars"
+
+      - name: 🚀 Terraform Apply (only on main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -input=false -var-file="./variables/${{ env.ENVIRONMENT }}.tfvars"
+
+      - name: Azure CLI Logout
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az logout
+            az cache purge
+            az account clear

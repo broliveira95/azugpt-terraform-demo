@@ -1,10 +1,14 @@
 name: Terraform Azure CI/CD
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  workflow_call:
+    inputs:
+      WORKING_DIRECTORY:
+        required: true
+        type: string
+      ENVIRONMENT:
+        required: false
+        type: string
 
 permissions:
   id-token: write
@@ -14,14 +18,14 @@ jobs:
   terraform:
     name: Terraform Pipeline
     runs-on: ubuntu-latest
-    environment: development
+    environment: ${{ inputs.ENVIRONMENT }}
     env:
       ARM_USE_OIDC: true
       ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       WORKING_DIRECTORY: "./iac/rg-azug-demo"
-      ENVIRONMENT: development
+      ENVIRONMENT: ${{ inputs.ENVIRONMENT }}
 
     steps:
       - name: 📥 Checkout code

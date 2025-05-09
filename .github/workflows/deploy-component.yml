@@ -1,4 +1,4 @@
-name: Terraform Azure CI/CD
+name: Deploy component
 
 on:
   workflow_call:

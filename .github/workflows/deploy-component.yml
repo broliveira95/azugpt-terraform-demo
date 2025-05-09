@@ -55,15 +55,13 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: terraform validate
 
-      - name: 🧹 Terraform Lint (tflint)
+      - name: ⚙️ Setup Terraform Lint (tflint)
         if: ${{ github.event_name == 'pull_request' }}
         uses: terraform-linters/setup-tflint@v4
-      - run: tflint --init && tflint
 
       - name: 🧹 Terraform Lint (tflint)
         if: ${{ github.event_name == 'pull_request' }}
-        uses: terraform-linters/setup-tflint@v4
-      - run: tflint --init && tflint
+        run: tflint --init && tflint
 
       - name: 🔒 Security Scan (tfsec)
         if: ${{ github.event_name == 'pull_request' }}

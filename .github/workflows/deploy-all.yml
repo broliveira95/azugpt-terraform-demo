@@ -11,15 +11,15 @@ permissions:
   contents: read
 
 jobs:
-  development:
-    uses: ./.github/workflows/deploy-component.yml
-    with:
-      WORKING_DIRECTORY: ./iac/rg-azug-demo
-      ENVIRONMENT: development
-
-  # production:
-  #   needs: [development]
+  # development:
   #   uses: ./.github/workflows/deploy-component.yml
   #   with:
-  #     COMPONENT: "./iac/rg-azug-demo"
-  #     ENVIRONMENT: production
+  #     WORKING_DIRECTORY: ./iac/rg-azug-demo
+  #     ENVIRONMENT: development
+
+  production:
+    # needs: [development]
+    uses: ./.github/workflows/deploy-component.yml
+    with:
+      COMPONENT: "./iac/rg-azug-demo"
+      ENVIRONMENT: production
